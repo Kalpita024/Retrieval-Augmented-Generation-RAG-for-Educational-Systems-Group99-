@@ -1,28 +1,23 @@
-import fitz  # PyMuPDF
 import logging
+from langchain_community.document_loaders import PyMuPDFLoader
 
 logger = logging.getLogger(__name__)
 
+
 def load_pdf(pdf_path):
     """
-    Load a single PDF and extract text page by page.
+    Load a single PDF using PyMuPDF and return LangChain Documents.
     """
 
     try:
         logger.info(f"Loading PDF: {pdf_path}")
 
-        pdf = fitz.open(pdf_path)
+        loader = PyMuPDFLoader(pdf_path)
+        documents = loader.load()
 
-        documents = []
-
-        for page_num in range(len(pdf)):
-            page = pdf[page_num]
-            text = page.get_text()
-
-            documents.append({
-                "page": page_num + 1,
-                "content": text
-            })
+        if not documents:
+            logger.warning(f"No content found in {pdf_path}")
+            return []
 
         logger.info(f"Successfully loaded {pdf_path}")
         logger.info(f"Pages loaded: {len(documents)}")
@@ -36,14 +31,14 @@ def load_pdf(pdf_path):
 
 def load_multiple_pdfs(pdf_paths):
     """
-    Load multiple PDFs.
+    Load multiple PDFs and combine all documents.
     """
 
     all_documents = []
 
     for pdf_path in pdf_paths:
-        docs = load_pdf(pdf_path)
-        all_documents.extend(docs)
+        documents = load_pdf(pdf_path)
+        all_documents.extend(documents)
 
     logger.info(f"Total pages loaded: {len(all_documents)}")
 
@@ -54,11 +49,12 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
 
-    pdfs = ["sample.pdf"]
+    pdf_files = [
+        "sample.pdf"
+    ]
 
-    docs = load_multiple_pdfs(pdfs)
+    documents = load_multiple_pdfs(pdf_files)
 
-    print("\nFirst page preview:\n")
-
-    if docs:
-        print(docs[0]["content"][:1000])
+    if documents:
+        print("\nFirst page preview:\n")
+        print(documents[0].page_content[:1000])
