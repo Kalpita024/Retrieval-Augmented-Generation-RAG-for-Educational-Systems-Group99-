@@ -1,18 +1,23 @@
-from langchain_community.document_loaders import PyPDFLoader
 import logging
+from langchain_community.document_loaders import PyMuPDFLoader
 
 logger = logging.getLogger(__name__)
 
+
 def load_pdf(pdf_path):
     """
-    Load a single PDF and return LangChain documents.
+    Load a single PDF using PyMuPDF and return LangChain Documents.
     """
 
     try:
         logger.info(f"Loading PDF: {pdf_path}")
 
-        loader = PyPDFLoader(pdf_path)
+        loader = PyMuPDFLoader(pdf_path)
         documents = loader.load()
+
+        if not documents:
+            logger.warning(f"No content found in {pdf_path}")
+            return []
 
         logger.info(f"Successfully loaded {pdf_path}")
         logger.info(f"Pages loaded: {len(documents)}")
@@ -32,8 +37,8 @@ def load_multiple_pdfs(pdf_paths):
     all_documents = []
 
     for pdf_path in pdf_paths:
-        docs = load_pdf(pdf_path)
-        all_documents.extend(docs)
+        documents = load_pdf(pdf_path)
+        all_documents.extend(documents)
 
     logger.info(f"Total pages loaded: {len(all_documents)}")
 
