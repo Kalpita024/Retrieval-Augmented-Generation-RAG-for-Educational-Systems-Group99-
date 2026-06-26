@@ -86,10 +86,21 @@ def generate_embeddings(
  
  
 def get_query_embedding(query: str) -> np.ndarray:
-    """Embed a search query via Voyage API (input_type='query')."""
-    vo     = get_voyage_client()
-    result = vo.embed([query], model=VOYAGE_EMBEDDING_MODEL, input_type="query")
-    vec    = np.array(result.embeddings[0], dtype="float32")
-    vec = vec / max(np.linalg.norm(vec), 1e-10)
-    return vec.reshape(1, -1)
+    vo = get_voyage_client()
+
+    try:
+        result = vo.embed(
+            [query],
+            model=VOYAGE_EMBEDDING_MODEL,
+            input_type="query"
+        )
+
+        vec = np.array(result.embeddings[0], dtype="float32")
+        vec = vec / max(np.linalg.norm(vec), 1e-10)
+
+        return vec.reshape(1, -1)
+
+    except Exception as e:
+        logger.error(f"Query embedding failed: {e}")
+        raise
 
