@@ -23,7 +23,11 @@ if not VOYAGE_API_KEY:
     raise ValueError("VOYAGE_API_KEY is missing — add it to your .env file")
 if not GROQ_API_KEY:
     raise ValueError("GROQ_API_KEY is missing — add it to your .env file")
-
+if not VOYAGE_EMBEDDING_MODEL:
+    raise ValueError("VOYAGE_EMBEDDING_MODEL is missing — add it to your .env file")
+if not GROQ_LLM_MODEL:
+    raise ValueError("GROQ_LLM_MODEL is missing — add it to your .env file")
+    
 # CACHED CLIENTS 
 
 @lru_cache(maxsize=1)
