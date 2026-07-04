@@ -1,4 +1,5 @@
 import streamlit as st
+import re
 
 st.set_page_config(
     page_title="Exam Preparation Chatbot",
@@ -10,6 +11,10 @@ st.set_page_config(
 # ── SESSION STATE ──
 if "active_tab" not in st.session_state:
     st.session_state.active_tab = "Summary"
+if "flashcards" not in st.session_state:
+    st.session_state.flashcards = []
+if "revealed" not in st.session_state:
+    st.session_state.revealed = {}
 
 # ── GLOBAL BEIGE BACKGROUND + FONTS ──
 st.markdown("""
@@ -28,7 +33,6 @@ st.markdown("""
         font-family: 'Playfair Display', serif !important;
     }
 
-    /* Apply Playfair only to text elements, NOT icons */
     [data-testid="stSidebar"] p,
     [data-testid="stSidebar"] span,
     [data-testid="stSidebar"] label,
@@ -39,7 +43,6 @@ st.markdown("""
         color: #3B2F1E;
     }
 
-    /* Keep icon fonts untouched so they render as icons, not text */
     [data-testid="stSidebar"] [data-testid="stIconMaterial"],
     [data-testid="stSidebar"] .material-icons,
     [data-testid="stSidebar"] [class*="icon"] {
@@ -163,7 +166,31 @@ with st.sidebar:
 
     if st.button("🤖 Ask Questions"):
         st.session_state.active_tab = "QA"
-  
+
+# ── HELPER: Parse flashcard text from backend ──
+def parse_flashcards(raw_text: str):
+    """
+    Parses backend output format:
+    1. Front: question
+       Back: answer
+    """
+    cards = []
+    # Split by numbered items like "1." "2." etc
+    blocks = re.split(r'\n?\d+\.\s*', raw_text)
+    for block in blocks:
+        block = block.strip()
+        if not block:
+            continue
+        # Extract Front and Back
+        front_match = re.search(r'Front:\s*(.+?)(?=Back:|$)', block, re.DOTALL | re.IGNORECASE)
+        back_match  = re.search(r'Back:\s*(.+?)$', block, re.DOTALL | re.IGNORECASE)
+        if front_match and back_match:
+            cards.append({
+                "question": front_match.group(1).strip(),
+                "answer":   back_match.group(1).strip()
+            })
+    return cards
+
 # ── CONTENT AREA ──
 if st.session_state.active_tab == "Summary":
     st.markdown("### 📄 Summary")
@@ -172,8 +199,70 @@ if st.session_state.active_tab == "Summary":
 
 elif st.session_state.active_tab == "Flashcards":
     st.markdown("### 🃏 Flashcards")
-    st.info("Upload a PDF and click Generate Flashcards to see results here.")
-    st.button("✨ Generate Flashcards")
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    count = st.slider("Number of flashcards", min_value=5, max_value=20, value=10, step=1)
+
+    if st.button("✨ Generate Flashcards"):
+        if uploaded_file:
+            # ── Connect to backend here ──
+            # from flashcards import generate_flashcards
+            # context = extract_text(uploaded_file)
+            # raw = generate_flashcards(context, count)
+            # st.session_state.flashcards = parse_flashcards(raw)
+
+            # ── Placeholder until backend is connected ──
+            st.warning("Connect backend: call generate_flashcards(context, count) here.")
+        else:
+            st.error("Please upload a PDF first!")
+
+    flashcards = st.session_state.flashcards
+
+    if flashcards:
+        st.markdown(f"**{len(flashcards)} Flashcards Generated**")
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        for i, card in enumerate(flashcards):
+            is_revealed = st.session_state.revealed.get(i, False)
+
+            st.markdown(f"""
+                <div style="
+                    background-color: #EDE0C4;
+                    border: 1px solid #C8AD7F;
+                    border-radius: 14px;
+                    padding: 22px 26px;
+                    margin-bottom: 6px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                ">
+                    <div style="
+                        font-size: 0.75rem;
+                        font-weight: 700;
+                        color: #A0845C;
+                        letter-spacing: 0.1em;
+                        text-transform: uppercase;
+                        margin-bottom: 8px;
+                        font-family: 'Nunito', sans-serif;
+                    ">🃏 Card {i+1}</div>
+                    <div style="
+                        font-family: 'Playfair Display', serif;
+                        font-size: 1.05rem;
+                        color: #3B2F1E;
+                        font-weight: 600;
+                        margin-bottom: 12px;
+                    ">{card['question']}</div>
+                    {"<div style='border-top: 1px solid #C8AD7F; padding-top: 12px; font-family: Nunito, sans-serif; font-size: 0.95rem; color: #5C4827;'>💡 " + card['answer'] + "</div>" if is_revealed else ""}
+                </div>
+            """, unsafe_allow_html=True)
+
+            btn_label = "🙈 Hide Answer" if is_revealed else "👁️ Reveal Answer"
+            if st.button(btn_label, key=f"reveal_{i}"):
+                st.session_state.revealed[i] = not is_revealed
+                st.rerun()
+
+            st.markdown("<br>", unsafe_allow_html=True)
+
+    else:
+        st.info("Click '✨ Generate Flashcards' to see styled flashcards here.")
 
 elif st.session_state.active_tab == "Notes":
     st.markdown("### 📝 Notes")
