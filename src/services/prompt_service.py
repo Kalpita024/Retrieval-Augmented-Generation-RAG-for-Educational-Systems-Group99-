@@ -1,5 +1,9 @@
 # FIXED — cache loaded prompts + readable error on missing file
+from pathlib import Path
 from functools import lru_cache
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 @lru_cache(maxsize=32)
 def load_prompt(path):

@@ -1,6 +1,10 @@
-
-# FIXED — handles both
+import json
 import re
+
+from src.utils.logger import get_logger
+
+logger = get_logger()
+
 
 def parse_json_response(content):
     try:
