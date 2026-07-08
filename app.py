@@ -1,6 +1,7 @@
 import streamlit as st
 import re
 import sys
+import os
 from pathlib import Path
 from io import BytesIO
 from dotenv import load_dotenv
@@ -15,6 +16,16 @@ from dotenv import load_dotenv
 # os.environ by the time ChatGroq() is constructed.
 REPO_ROOT = Path(__file__).resolve().parent
 load_dotenv(REPO_ROOT / ".env")
+
+# On Streamlit Cloud there is no .env file (correctly — it's gitignored).
+# Cloud instead exposes secrets via st.secrets, which does NOT automatically
+# populate os.environ. base_chain.py reads the key via os.getenv(), so we
+# bridge it here manually if it's not already set locally.
+if "GROQ_API_KEY" not in os.environ:
+    try:
+        os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
+    except Exception:
+        pass
 
 # The generator files in src/study_tools/ use flat imports
 # (e.g. "from base_chain import run_prompt"), so study_tools/
