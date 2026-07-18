@@ -6,7 +6,7 @@ App link https://exam-prep-bot.streamlit.app
 
 ## 📌 Project Overview
 
-EduGenie AI is a college group project built as part of our first-year engineering curriculum. It uses Large Language Models (LLMs), LangChain, and FAISS vector search to let students upload any academic PDF and instantly generate personalized study material from it.
+StudyMind AI is a college group project built as part of our first-year engineering curriculum. It uses Large Language Models (LLMs), LangChain, and FAISS vector search to let students upload any academic PDF and instantly generate personalized study material from it.
 
 The core idea is **RAG (Retrieval Augmented Generation)** — instead of the AI guessing answers, it reads your actual document and answers based on that content.
 
@@ -22,18 +22,7 @@ The core idea is **RAG (Retrieval Augmented Generation)** — instead of the AI 
 ### 📚 Study Tools
 - **Notes Generator** — structured notes with headings and bullet points
 - **Flashcards** — question-answer pairs for active recall
-- **MCQ Generator** — exam-style multiple choice questions with answers
-- **Question Bank** — 2-mark, 5-mark, and 10-mark questions sorted by difficulty
-
-### 📊 Content Analysis
-- **Topic Extraction** — identifies all major topics from the PDF
-- **Topic Coverage** — visualizes how thoroughly each topic is covered
-- **Importance Ranking** — ranks topics by exam relevance
-
-### 📝 Exam Preparation
-- **Mock Test** — interactive timed exam simulation with instant scoring
-- **Revision Sheet** — condensed definitions, formulas, and key concepts
-- Difficulty selector: Easy / Medium / Hard / Mixed
+- **Summary** — 2-mark, 5-mark, and 10-mark questions sorted by difficulty
 
 ### 💬 AI Chat Assistant
 - Ask any question about the uploaded document
@@ -48,7 +37,7 @@ The core idea is **RAG (Retrieval Augmented Generation)** — instead of the AI 
 User uploads PDF
       │
       ▼
-PDF Loader (PyPDF)
+PDF Loader (PyMuPDF)
       │
       ▼
 Text Splitter (RecursiveCharacterTextSplitter)
@@ -154,8 +143,8 @@ EduGenie/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-team/EduGenie
-cd EduGenie
+git clone https://github.com/your-team/StudyMind
+cd StudyMind
 ```
 
 ### 2. Create and activate a virtual environment
