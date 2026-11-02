@@ -224,11 +224,7 @@ Open your browser at `http://localhost:8501`
 - Adaptive difficulty based on user performance
 - User login and study history tracking
 
----
 
-## 📄 License
-
-MIT License — free to use, modify, and distribute for educational purposes.
 
 ---
 
